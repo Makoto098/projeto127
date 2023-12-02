@@ -1,9 +1,13 @@
-song = "music.mp3";
-song = "music2.mp3";
+song = "";
+song1 = "";
+leftWristX = 0;
+leftWristY = 0;
+rightWristX = 0;
+rightWristY = 0;
 
 function preload() {
-  song1 = loadSound("music.mp3");
-  song2 = loadSound("music2.mp3");
+  song = loadSound("music.mp3");
+  song1 = loadSound("music2.mp3");
 }
 
 function setup() {
@@ -17,6 +21,53 @@ function setup() {
   poseNet.on("pose", gotePoses);
 }
 
+function modelLoaded() {
+  console.log("poseNet Is Initialized");
+}
+
 function draw() {
   image(video, 0, 0, 600, 500);
+
+  fill("#FF0000");
+  stroke("#FF0000");
+
+  if (scorerightWrist > 0.2) {
+    circle(rightWristX, rightWristY, 20);
+
+    if (rightWrist > 0 && rightWrist <= 100) {
+      document.getElementById("speed").innerHTML = "Velocidade = 0.5x";
+      song.rate(0.5);
+    } else if (rightWristY > 100 && rightWristY <= 200) {
+      document.getElementById("speed").innerHTML = "Velocidade = 1x";
+      song.rate(1);
+    }
+  }
+  if (scoreLeftWrist > 0.2) {
+    circle(leftWristX, leftWristY, 20);
+    InNumberleftWristY = Number(leftWristY);
+    remove_decimal = floor(InNumberleftWristY);
+    volume = remove_decimals / 500;
+    document.getElementById("volume").innerHTML = "Volume = " + volume;
+    song.setVolume(volume);
+  }
+}
+
+function play() {
+  song.play();
+}
+
+function gotPoses(results) {
+  if (results.length > 0) {
+    console.log(results);
+    scoreLeftWrist = results[0].pose.keypoints[9].score;
+    console.log("scoreLeftWrist =" + scoreLeftWrist);
+
+    leftWristX = results[0].pose.leftWrist.x;
+    leftWristY = results[0].pose.leftWrist.y;
+    console.log("leftWristX =" + leftWristX + "leftWristY =" + leftWristY);
+
+    rightWristX = results[0].pose.rightWrist.x;
+    rightWristY = results[0].pose.rightWrist.y;
+    console.log("rightWristX =" + rightWristX + "rightWristY =" + rightWristY);
+  }
 }
